@@ -70,11 +70,11 @@
             },
             function Страница_14_Задача_3DOT2() {
                 let number = (3 / 25) * (1 / 6);
-                let roundedNumber = roundNumberTo(number, 3);
-                let absoluteError = calculateAbsoluteError(number, roundedNumber);
-                let relativeError = calculateRelativeError(number, roundedNumber);
+                let numberApproximation = roundNumberTo((3 / 25), 3) * roundNumberTo((1 / 6), 3);
+                let absoluteError = calculateAbsoluteError(number, numberApproximation);
+                let relativeError = calculateRelativeError(number, numberApproximation);
                 return [
-                    roundedNumber,
+                    numberApproximation,
                     'Относителна грешка: ' + removeScienceNotationFromNumber(relativeError)
                 ].join('</br>');
             },
@@ -152,7 +152,8 @@
                     {x: 6.6, y: 3.79}
                 ], 3);
                 let result = 'Function: ' + f;
-                result += '</br> ' + eval(new algebra.parse(f).eval({x: new algebra.Fraction(253, 100)}).toString());
+                let x = new algebra.parse(f).eval({x: new algebra.Fraction(253, 100)});
+                result += '</br> ' + eval(x.toString());
                 return result;
             },
             function Страница_71_Задача_4Нормална() {
@@ -166,6 +167,22 @@
                     { x: 5.6, y: 3.4676 },
                     { x: 6.6, y: 3.79 }
                 ], 3, 2.53);
+                return eval(result);
+            },
+            function Страница_83_Задача_4() {
+                let f = approximateFunctionWithLagranceMethod([
+                    { x: 5, y: 4.086 },
+                    { x: 5.3, y: 4.186 },
+                    { x: 5.6, y: 4.298 },
+                    { x: 5.9, y: 4.428 },
+                    { x: 6.2, y: 4.584 },
+                    { x: 6.5, y: 4.777 },
+                    { x: 6.8, y: 5.023 },
+                    { x: 7.1, y: 5.34 }  
+                ], 3);
+                let result = 'Function: ' + f;
+                let x = new algebra.parse(f).eval({x: new algebra.Fraction(545, 100)});
+                result += '</br>' +  x.toString();
                 return result;
             },
             '<h1></h1>',

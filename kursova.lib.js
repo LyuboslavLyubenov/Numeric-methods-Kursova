@@ -1,4 +1,6 @@
-
+function calculateLogWithBase(number, base) {
+    return Math.log(number) / (base ? Math.log(base) : 1);
+}
 
 function calculateRelativeError(number, numberApproximation) {
     return calculateAbsoluteError(number, numberApproximation) / Math.abs(number);
@@ -113,11 +115,15 @@ function calculateRootWithBisectionMethod(a, b, f, tolerance) {
     }
 }
 
-function calculateRootWithFixedPointMethod(f, tolerance) {
+function calculateRootWithFixedPointMethod(f, tolerance, startX) {
     const maxNumberOfIterations = 10000;
 
     let iterations = 0;
-    let p1 = 1;
+    let p1 = Math.random() * 100;
+
+    if (startX) {
+        p1 = startX;
+    }
 
     while (++iterations < maxNumberOfIterations) {
         let p = f(p1);
@@ -126,6 +132,8 @@ function calculateRootWithFixedPointMethod(f, tolerance) {
         }
         p1 = p;
     }
+
+    return p1;
 }
 
 function reduceFractionInExpression(expression) {
@@ -164,12 +172,14 @@ function calculateSum(f, start, end) {
 }
 
 function calculateFirstExpressionLagrance(points, k, power) {
-    return points[k].y / +calculateProduct(function (i) {
+    let product = calculateProduct(function (i) {
         if (i === k) {
             return;
         }
         return points[k].x - points[i].x;
-    }, 0, power);
+    }, 0, power).toString();
+   
+    return points[k].y / parseFloat(product);
 }
 
 function calculateSecondExpressionLagrance(points, k, power) {
@@ -224,17 +234,32 @@ function approximateXWithLagranceMethod(points, power, x) {
 
     let result = calculateSum(function (k) {
         console.log('Iteration ' + k);
+
         let expression = 0;
         let firstPartOfExpression = calculateFirstExpressionLagrance(points, k, power);
         let secondPartOfExpression = calculateSecondExpressionLagranceWithKnownX(points, k, power, x);
+
+        console.log('First part of expression: ' + firstPartOfExpression);
+        console.log('Second part of expression: ' + secondPartOfExpression);
 
         expression += firstPartOfExpression * secondPartOfExpression;
 
         console.log('Expression: ' + expression.toString());
 
         return expression;        
-    }, 0, power).toString();
+    }, 0, power);
 
-    return reduceFractionInExpression(eval(result) + '');
+    return result.toString();
+}
+
+function approximateFunctionWithNewtonMethod(points, power, x) {
+    let result = points[0].y;
+    result += calculateSum(function (index) {
+        
+    }, 1, points.length);
+    result *= calculateProduct(function (index) {
+
+    }, 0, );
+
 }
 
