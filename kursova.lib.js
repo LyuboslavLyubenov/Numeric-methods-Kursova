@@ -1,3 +1,5 @@
+//import * as algebra from "./algebra-0.2.6.min";
+
 function calculateLogWithBase(number, base) {
     return Math.log(number) / (base ? Math.log(base) : 1);
 }
@@ -18,26 +20,26 @@ function convertToDecimal(binaryRepresentation) {
     if (binaryRepresentation.length !== 64) {
         throw 'Must be 64 bit binary number to convert to decimal';
     }
-    
+
     console.log('Converting to decimal number: ' + binaryRepresentation);
 
     let sign = parseInt(binaryRepresentation[0]);
     let c = parseInt(binaryRepresentation.slice(1, 12), 2);
     let f = convertDecimalPart(binaryRepresentation.slice(12, 52));
-    
+
     console.log([
         's = ' + sign,
         'c = ' + c,
         'f = ' + f
     ].join('\n'));
-    
+
     return Math.pow(-1, sign) * Math.pow(2, c - 1023) * (1 + f);
 }
 
 function convertDecimalPart(decimalPart) {
     let result = 0;
     decimalPart.split('').forEach(function (bit, index) {
-        result += bit * Math.pow(1/2, index + 1);
+        result += bit * Math.pow(1 / 2, index + 1);
     });
     return result;
 }
@@ -85,7 +87,7 @@ function calculateRootWithBisectionMethod(a, b, f, tolerance) {
 
     let iterations = 0;
 
-    while (true) { 
+    while (true) {
         let fa = f(a);
         let fb = f(b);
         let mid = (a + b) / 2;
@@ -95,7 +97,7 @@ function calculateRootWithBisectionMethod(a, b, f, tolerance) {
             'fa = ' + fa,
             'fb = ' + fb,
             'mid = ' + mid,
-            'fmid = ' + fmid 
+            'fmid = ' + fmid
         ].join('\n'));
 
         if (fmid === 0) {
@@ -138,8 +140,7 @@ function calculateRootWithFixedPointMethod(f, tolerance, startX) {
 
 function reduceFractionInExpression(expression) {
     let regex = /[0-9]+\/[0-9]+/g;
-    let match = regex.exec(expression);
-    return expression.replace(regex, function (match) { 
+    return expression.replace(regex, function (match) {
         return Ratio.parse(match).simplify().toString();
     });
 }
@@ -155,7 +156,7 @@ function performOperationBetweenExpressions(f, start, end, operation) {
     for (let i = start; i <= end; i++) {
         let fResult = f(i);
         if (fResult) {
-            result.push('(' + fResult + ')');   
+            result.push('(' + fResult + ')');
         }
     }
 
@@ -178,7 +179,7 @@ function calculateFirstExpressionLagrance(points, k, power) {
         }
         return points[k].x - points[i].x;
     }, 0, power).toString();
-   
+
     return points[k].y / parseFloat(product);
 }
 
@@ -199,20 +200,20 @@ function calculateSecondExpressionLagranceWithKnownX(points, k, power, x) {
         return x - points[i].x;
     }, 0, power);
 
-    product = eval(product.toString()); 
+    product = eval(product.toString());
     return product;
 }
 
 function approximateFunctionWithLagranceMethod(points, power) {
     console.log('Approximating with lagrance (function)...');
-    
+
     let result = calculateSum(function (k) {
         console.log('Iteration ' + k);
 
         let expression = '';
         let firstPartOfExpression = calculateFirstExpressionLagrance(points, k, power).toString();
         let secondPartOfExpression = calculateSecondExpressionLagrance(points, k, power).toString();
-        
+
         expression += '(' + firstPartOfExpression + ')';
         expression += '*';
         expression += '(' + secondPartOfExpression + ')';
@@ -246,20 +247,129 @@ function approximateXWithLagranceMethod(points, power, x) {
 
         console.log('Expression: ' + expression.toString());
 
-        return expression;        
+        return expression;
     }, 0, power);
 
     return result.toString();
 }
 
-function approximateFunctionWithNewtonMethod(points, power, x) {
-    let result = points[0].y;
-    result += calculateSum(function (index) {
-        
-    }, 1, points.length);
-    result *= calculateProduct(function (index) {
+/** Solve a linear system of equations given by a n&times;n matrix
+ with a result vector n&times;1.
+ https://martin-thoma.com/solving-linear-equations-with-gaussian-elimination/
+ */
+function gauss(A) {
+    var n = A.length;
 
-    }, 0, );
+    for (var i = 0; i < n; i++) {
+        // Search for maximum in this column
+        var maxEl = Math.abs(A[i][i]);
+        var maxRow = i;
+        for (var k = i + 1; k < n; k++) {
+            if (Math.abs(A[k][i]) > maxEl) {
+                maxEl = Math.abs(A[k][i]);
+                maxRow = k;
+            }
+        }
 
+        // Swap maximum row with current row (column by column)
+        for (var k = i; k < n + 1; k++) {
+            var tmp = A[maxRow][k];
+            A[maxRow][k] = A[i][k];
+            A[i][k] = tmp;
+        }
+
+        // Make all rows below this one 0 in current column
+        for (k = i + 1; k < n; k++) {
+            var c = -A[k][i] / A[i][i];
+            for (var j = i; j < n + 1; j++) {
+                if (i == j) {
+                    A[k][j] = 0;
+                } else {
+                    A[k][j] += c * A[i][j];
+                }
+            }
+        }
+    }
+
+    // Solve equation Ax=b for an upper triangular matrix A
+    var x = new Array(n);
+    for (var i = n - 1; i > -1; i--) {
+        x[i] = A[i][n] / A[i][i];
+        for (var k = i - 1; k > -1; k--) {
+            A[k][n] -= A[k][i] * x[i];
+        }
+    }
+    return x;
 }
 
+function calculateSumOfNumbersInArray(array) {
+    let result = 0;
+
+    for (let i = 0; i < array.length; i++) {
+        result += array[i];
+    }
+
+    return result;
+}
+
+function calculateFirstRowLeastSquaresMethod(points) {
+    let row = [];
+
+    row.push(points.length);
+
+    let firstSum = calculateSumOfNumbersInArray(points.map(point => point['x']));
+    row.push(firstSum);
+
+    let secondSum = calculateSumOfNumbersInArray(points.map(point => point['y']));
+    secondSum = parseFloat(secondSum.toString());
+    row.push(secondSum);
+
+    return row;
+}
+
+function calculateRowLeastSquaresMethod(points, rowIndex, power) {
+    let row = [];
+
+    for (let k = 0; k <= power; k++) {
+        let leftPartPoints = points.map(point => Math.pow(point['x'], rowIndex + k));
+        let leftPartSum = calculateSumOfNumbersInArray(leftPartPoints);
+        row.push(leftPartSum);
+    }
+
+    let rightPartPoints = points.map(point => Math.pow(point['x'], rowIndex) * point['y']);
+    let rightPartSum = calculateSumOfNumbersInArray(rightPartPoints);
+    row.push(rightPartSum);
+
+    return row;
+}
+
+function approximateXWithLeastSquaresMethod(points, power, x, roundTo) {
+    console.log('Approximating with smallest squares method (only value)...');
+
+    if (!roundTo) {
+        roundTo = 3;
+    }
+
+    if (power === 0) {
+        let result = calculateSumOfNumbersInArray(points.map(point => point['x']));
+        result = result * (1 / points.length);
+        return result;
+    }
+
+    let matrix = [];
+    let row;
+
+    for (let i = 0; i <= power; i++) {
+        row = calculateRowLeastSquaresMethod(points, i, power).map(number => roundNumberTo(number, roundTo));
+        matrix.push(row);
+    }
+
+    let gaussResult = gauss(matrix).map(number => roundNumberTo(number, roundTo));
+    let endResult = gaussResult[0];
+
+    for (let i = 1; i < gaussResult.length; i++) {
+        endResult += Math.pow(-1, i + 1) * Math.pow(gaussResult[i], i) * Math.pow(x, i);
+    }
+
+    return endResult;
+}

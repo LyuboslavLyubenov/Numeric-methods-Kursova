@@ -17,216 +17,234 @@
 </head>
 
 <body>
-    <div id="container"></div>
-    <script src="./algebra-0.2.6.min.js"></script>
-    <script src="./ratio.js"></script>
-    <script src="./kursova.lib.js"></script>
-    <script>
+<div id="container"></div>
+<script src="./algebra-0.2.6.min.js"></script>
+<script src="./ratio.js"></script>
+<script src="./kursova.lib.js"></script>
+<script>
 
 
-        //ako e string, Пляска html на страницата
-        //ако е обект, рендерира задачите дефинирани в него        
-        //
-        //Примерно:
-        //
-        //resheniq.push('<h1>Любо е як</h1>'); <- отпечатва Любо е як на страницата в h1 tag
-        //
-        //Другият пример рендерира задачите:
-        //{
-        // Страница_{stranica}_{tip}_{nomer}: function () {
-        //  return rezultat;
-        //},
-        // Страница_{stranica}_{tip}_{nomer}: function () {
-        // return rezultat;
-        //}
-        //и тн..
-        //
+    //ako e string, Пляска html на страницата
+    //ако е обект, рендерира задачите дефинирани в него
+    //
+    //Примерно:
+    //
+    //resheniq.push('<h1>Любо е як</h1>'); <- отпечатва Любо е як на страницата в h1 tag
+    //
+    //Другият пример рендерира задачите:
+    //{
+    // Страница_{stranica}_{tip}_{nomer}: function () {
+    //  return rezultat;
+    //},
+    // Страница_{stranica}_{tip}_{nomer}: function () {
+    // return rezultat;
+    //}
+    //и тн..
+    //
 
-        var resheniq = [
-            '<h1>Представяне на числата с плаваща запетая</h1>',
-            '<h2>Примери:</h2>',
-            function Страница_4_Пример_1() {
-                return removeScienceNotationFromNumber(convertToDecimal('010000000011101110010001' + Array(41).join('0')));
-            },
-            function Страница_6_Пример_2() {
-                let number = Math.E;
-                let roundedNumber = roundNumberTo(number, 9);
-                return roundedNumber;
-            },
-            function Страница_7_Пример_3() {
-                let number = 2.5
-                let numberApproximation = 2.6;
-                return '</br>Абсолютна грешка: ' + roundNumberTo(calculateAbsoluteError(number, numberApproximation), 5) +
-                    '</br>Относителна грешка: ' + roundNumberTo(calculateRelativeError(number, numberApproximation), 5);
-            },
-            function Страница_8_Пример_4() {
-                let number = Math.PI;
-                let numberApproximation = 22 / 7;
-                return calculateRelativeError(number, numberApproximation);
-            },
-            '<h2>Задачи:</h2>',
-            function Страница_14_Задача_1DOT1() {
-                return removeScienceNotationFromNumber(convertToDecimal('01000000101010010011' + Array(45).join('0')));
-            },
-            function Страница_14_Задача_3DOT2() {
-                let number = (3 / 25) * (1 / 6);
-                let numberApproximation = roundNumberTo((3 / 25), 3) * roundNumberTo((1 / 6), 3);
-                let absoluteError = calculateAbsoluteError(number, numberApproximation);
-                let relativeError = calculateRelativeError(number, numberApproximation);
-                return [
-                    numberApproximation,
-                    'Относителна грешка: ' + removeScienceNotationFromNumber(relativeError)
-                ].join('</br>');
-            },
-            '<h1>Приближено решаване на уравнения с едно неизвестно</h1>',
-            '<h2>Примери:</h2>',
-            function Страница_22_Пример_1() {
-                let result = calculateRootWithBisectionMethod(0, 1, function (x) {
-                    return Math.exp(x) + 2 * x - 2;
-                }, 0.001);
-                return result;
-            },
-            '<h2>Задачи:</h2>',
-            function Страница_26_Задача_10() {
-                let result = calculateRootWithBisectionMethod(0, 2, function (x) {
-                    return 0.558 * Math.sin(x) + 1 - x;
-                }, 0.001);
-                return result;
-            },
-            '<h1>Метод на неподвижната точка</h1>',
-            '<h2>Примери:</h2>',
-            function Страница_32_Пример_2() {
-                let result = calculateRootWithFixedPointMethod(function (x) {
-                    console.log(x);
-                    return Math.exp(-x);
-                }, 0.01);
-                return roundNumberTo(result, 6);
-            },
-            '<h2>Задачи:</h2>',
-            function Страница_48_Задача_1() {
-                let result = calculateRootWithFixedPointMethod(function (x) {
-                    return Math.pow(5, -x);
-                }, 0.001);
-                return result;
-            },
-            '<h1>Апроксимиране на функции. Интерполационен полином на Лагранж</h1>',
-            '<h2>Примери:</h2>',
-            function Страница_58_Пример_2() {
-                let result = approximateFunctionWithLagranceMethod([
-                    {x: 0, y: 1},
-                    {x: 1, y: -1}
-                ], 1);
-                return result;
-            },
-            function Страница_61_Пример_3() {
-                let result = approximateFunctionWithLagranceMethod([
-                    {x: -1, y: 2},
-                    {x: 0, y: 1},
-                    {x: 1, y: -1}
-                ], 2);
-                return result;
-            },
-            function Страница_63_Пример_4() {
-                let result = '';
-                let f = approximateFunctionWithLagranceMethod([
-                    {x: -1, y: 2},
-                    {x: 0, y: 1},
-                    {x: 1, y: -1},
-                    {x: 2, y: -5}
-                ], 3);
-
-                result = 'Function: ' + f;
-                result += '</br>' + eval(algebra.parse(f).eval({x: new algebra.Fraction(13, 10)}).toString());
-                return result;
-            },
-            '<h2>Задачи:</h2>',
-            function Страница_71_Задача_4() {
-                let f = approximateFunctionWithLagranceMethod([
-                    {x: -0.4, y: -0.1508},
-                    {x: 0.6, y: 0.0582},
-                    {x: 1.6, y: 1.1817},
-                    {x: 2.6, y: 2.0095},
-                    {x: 3.6, y: 2.6144},
-                    {x: 4.6, y: 3.08465},
-                    {x: 5.6, y: 3.4676},
-                    {x: 6.6, y: 3.79}
-                ], 3);
-                let result = 'Function: ' + f;
-                let x = new algebra.parse(f).eval({x: new algebra.Fraction(253, 100)});
-                result += '</br> ' + eval(x.toString());
-                return result;
-            },
-            function Страница_71_Задача_4Нормална() {
-                let result = approximateXWithLagranceMethod([
-                    { x: -0.4, y: -0.1508 },
-                    { x: 0.6, y: 0.0582 },
-                    { x: 1.6, y: 1.1817 },
-                    { x: 2.6, y: 2.0095 },
-                    { x: 3.6, y: 2.6144 },
-                    { x: 4.6, y: 3.08465 },
-                    { x: 5.6, y: 3.4676 },
-                    { x: 6.6, y: 3.79 }
-                ], 3, 2.53);
-                return eval(result);
-            },
-            function Страница_83_Задача_4() {
-                let f = approximateFunctionWithLagranceMethod([
-                    { x: 5, y: 4.086 },
-                    { x: 5.3, y: 4.186 },
-                    { x: 5.6, y: 4.298 },
-                    { x: 5.9, y: 4.428 },
-                    { x: 6.2, y: 4.584 },
-                    { x: 6.5, y: 4.777 },
-                    { x: 6.8, y: 5.023 },
-                    { x: 7.1, y: 5.34 }  
-                ], 3);
-                let result = 'Function: ' + f;
-                let x = new algebra.parse(f).eval({x: new algebra.Fraction(545, 100)});
-                result += '</br>' +  x.toString();
-                return result;
-            },
-            '<h1></h1>',
-        ];
-
-        //Долната част се използва за рендериране на задачите на страницата
-        const zadachaHTMLTemplate = 'Страница {pageNumber} </br> {typeOfTask} номер {taskNumber} </br> Oтговор: <b>{value}</b> </br></br>';
-
-        function isString(x) {
-            return typeof x === 'string';
-        }
-
-        function format(string, values) {
-            let result = string;
-            Object.keys(values).forEach(function (name) {
-                result = result.replace('{' + name + '}', values[name]);
-            });
+    let resheniq = [
+        '<h1>Представяне на числата с плаваща запетая</h1>',
+        '<h2>Примери:</h2>',
+        function Страница_4_Пример_1() {
+            return removeScienceNotationFromNumber(convertToDecimal('010000000011101110010001' + Array(41).join('0')));
+        },
+        function Страница_6_Пример_2() {
+            let number = Math.E;
+            let roundedNumber = roundNumberTo(number, 9);
+            return roundedNumber;
+        },
+        function Страница_7_Пример_3() {
+            let number = 2.5;
+            let numberApproximation = 2.6;
+            return '</br>Абсолютна грешка: ' + roundNumberTo(calculateAbsoluteError(number, numberApproximation), 5) +
+                '</br>Относителна грешка: ' + roundNumberTo(calculateRelativeError(number, numberApproximation), 5);
+        },
+        function Страница_8_Пример_4() {
+            let number = Math.PI;
+            let numberApproximation = 22 / 7;
+            return calculateRelativeError(number, numberApproximation);
+        },
+        '<h2>Задачи:</h2>',
+        function Страница_14_Задача_1DOT1() {
+            return removeScienceNotationFromNumber(convertToDecimal('01000000101010010011' + Array(45).join('0')));
+        },
+        function Страница_14_Задача_3DOT2() {
+            let number = (3 / 25) * (1 / 6);
+            let numberApproximation = roundNumberTo((3 / 25), 3) * roundNumberTo((1 / 6), 3);
+            let absoluteError = calculateAbsoluteError(number, numberApproximation);
+            let relativeError = calculateRelativeError(number, numberApproximation);
+            return [
+                numberApproximation,
+                'Относителна грешка: ' + removeScienceNotationFromNumber(relativeError)
+            ].join('</br>');
+        },
+        '<h1>Приближено решаване на уравнения с едно неизвестно</h1>',
+        '<h2>Примери:</h2>',
+        function Страница_22_Пример_1() {
+            let result = calculateRootWithBisectionMethod(0, 1, function (x) {
+                return Math.exp(x) + 2 * x - 2;
+            }, 0.001);
             return result;
-        }
+        },
+        '<h2>Задачи:</h2>',
+        function Страница_26_Задача_10() {
+            let result = calculateRootWithBisectionMethod(0, 2, function (x) {
+                return 0.558 * Math.sin(x) + 1 - x;
+            }, 0.001);
+            return result;
+        },
+        '<h1>Метод на неподвижната точка</h1>',
+        '<h2>Примери:</h2>',
+        function Страница_32_Пример_2() {
+            let result = calculateRootWithFixedPointMethod(function (x) {
+                console.log(x);
+                return Math.exp(-x);
+            }, 0.01);
+            return roundNumberTo(result, 6);
+        },
+        '<h2>Задачи:</h2>',
+        function Страница_48_Задача_1() {
+            let result = calculateRootWithFixedPointMethod(function (x) {
+                return Math.pow(5, -x);
+            }, 0.001);
+            return result;
+        },
+        '<h1>Апроксимиране на функции. Интерполационен полином на Лагранж</h1>',
+        '<h2>Примери:</h2>',
+        function Страница_58_Пример_2() {
+            let result = approximateFunctionWithLagranceMethod([
+                {x: 0, y: 1},
+                {x: 1, y: -1}
+            ], 1);
+            return result;
+        },
+        function Страница_61_Пример_3() {
+            let result = approximateFunctionWithLagranceMethod([
+                {x: -1, y: 2},
+                {x: 0, y: 1},
+                {x: 1, y: -1}
+            ], 2);
+            return result;
+        },
+        function Страница_63_Пример_4() {
+            let result = '';
+            let f = approximateFunctionWithLagranceMethod([
+                {x: -1, y: 2},
+                {x: 0, y: 1},
+                {x: 1, y: -1},
+                {x: 2, y: -5}
+            ], 3);
 
-        function generateZadachaHTML(pageNumber, typeOfTask, taskNumber, value) {
-            return format(zadachaHTMLTemplate, { pageNumber: pageNumber, typeOfTask: typeOfTask, taskNumber: taskNumber, value: value });
-        }
+            result = 'Function: ' + f;
+            result += '</br>' + eval(algebra.parse(f).eval({x: new algebra.Fraction(13, 10)}).toString());
+            return result;
+        },
+        '<h2>Задачи:</h2>',
+        function Страница_71_Задача_4() {
+            let f = approximateFunctionWithLagranceMethod([
+                {x: -0.4, y: -0.1508},
+                {x: 0.6, y: 0.0582},
+                {x: 1.6, y: 1.1817},
+                {x: 2.6, y: 2.0095},
+                {x: 3.6, y: 2.6144},
+                {x: 4.6, y: 3.08465},
+                {x: 5.6, y: 3.4676},
+                {x: 6.6, y: 3.79}
+            ], 3);
+            let result = 'Function: ' + f;
+            let x = new algebra.parse(f).eval({x: new algebra.Fraction(253, 100)});
+            result += '</br> ' + eval(x.toString());
+            return result;
+        },
+        function Страница_71_Задача_4Нормална() {
+            let result = approximateXWithLagranceMethod([
+                {x: -0.4, y: -0.1508},
+                {x: 0.6, y: 0.0582},
+                {x: 1.6, y: 1.1817},
+                {x: 2.6, y: 2.0095},
+                {x: 3.6, y: 2.6144},
+                {x: 4.6, y: 3.08465},
+                {x: 5.6, y: 3.4676},
+                {x: 6.6, y: 3.79}
+            ], 3, 2.53);
+            return eval(result);
+        },
+        function Страница_83_Задача_4() {
+            let f = approximateFunctionWithLagranceMethod([
+                {x: 5, y: 4.086},
+                {x: 5.3, y: 4.186},
+                {x: 5.6, y: 4.298},
+                {x: 5.9, y: 4.428},
+                {x: 6.2, y: 4.584},
+                {x: 6.5, y: 4.777},
+                {x: 6.8, y: 5.023},
+                {x: 7.1, y: 5.34}
+            ], 3);
+            let result = 'Function: ' + f;
+            let x = new algebra.parse(f).eval({x: new algebra.Fraction(545, 100)});
+            result += '</br>' + x.toString();
+            return result;
+        },
+        function Страница_83_Задача_4Нормална() {
+            let result = approximateXWithLagranceMethod([
+                {x: 5, y: 4.086},
+                {x: 5.3, y: 4.186},
+                {x: 5.6, y: 4.298},
+                {x: 5.9, y: 4.428},
+                {x: 6.2, y: 4.584},
+                {x: 6.5, y: 4.777},
+                {x: 6.8, y: 5.023},
+                {x: 7.1, y: 5.34}
+            ], 3, 5.45);
+            return result;
+        },
+        '<h1></h1>',
+    ];
 
-        function fillAnswers(resheniq) {
-            let container = document.getElementById('container');
+    //Долната част се използва за рендериране на задачите на страницата
+    const zadachaHTMLTemplate = 'Страница {pageNumber} </br> {typeOfTask} номер {taskNumber} </br> Oтговор: <b>{value}</b> </br></br>';
 
-            resheniq.forEach(function (value) {
-                if (isString(value)) {
-                    container.innerHTML += value;
-                    return;
-                }
-                
-                let textToOutput = value.name;
-                textToOutput = textToOutput.replace(/\_/g, ' ').replace(/DOT/g, '.');
-                let pageNumber = textToOutput.split(' ')[1];
-                let typeOfTask = textToOutput.split(' ')[2];
-                let taskNumber = textToOutput.split(' ')[3];
-                let zadachaHTML = generateZadachaHTML(pageNumber, typeOfTask, taskNumber, value());
-                container.innerHTML += zadachaHTML;
-            });
-        }
+    function isString(x) {
+        return typeof x === 'string';
+    }
 
-        fillAnswers(resheniq);
-    </script>
+    function format(string, values) {
+        let result = string;
+        Object.keys(values).forEach(function (name) {
+            result = result.replace('{' + name + '}', values[name]);
+        });
+        return result;
+    }
+
+    function generateZadachaHTML(pageNumber, typeOfTask, taskNumber, value) {
+        return format(zadachaHTMLTemplate, {
+            pageNumber: pageNumber,
+            typeOfTask: typeOfTask,
+            taskNumber: taskNumber,
+            value: value
+        });
+    }
+
+    function fillAnswers(resheniq) {
+        let container = document.getElementById('container');
+
+        resheniq.forEach(function (value) {
+            if (isString(value)) {
+                container.innerHTML += value;
+                return;
+            }
+
+            let textToOutput = value.name;
+            textToOutput = textToOutput.replace(/\_/g, ' ').replace(/DOT/g, '.');
+            let pageNumber = textToOutput.split(' ')[1];
+            let typeOfTask = textToOutput.split(' ')[2];
+            let taskNumber = textToOutput.split(' ')[3];
+            let zadachaHTML = generateZadachaHTML(pageNumber, typeOfTask, taskNumber, value());
+            container.innerHTML += zadachaHTML;
+        });
+    }
+
+    fillAnswers(resheniq);
+</script>
 </body>
 </html>
