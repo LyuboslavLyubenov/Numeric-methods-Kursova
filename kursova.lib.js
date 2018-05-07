@@ -72,9 +72,6 @@ function calculateRootWithBisectionMethod(a, b, f, tolerance) {
 
     console.log('Calculating root with bisection method...');
 
-    let leftInterval = a;
-    let rightInterval = b;
-
     if (f(a) === 0) {
         console.log('Root found: ' + a);
         return a;
@@ -253,6 +250,19 @@ function approximateXWithLagranceMethod(points, power, x) {
     return result.toString();
 }
 
+function kahanSum(floatingNumbers) {
+    let sum = floatingNumbers[0];
+    let c = 0.0;
+    for (let i = 1; i < floatingNumbers.length; i++) {
+        let y = floatingNumbers[i] - c;
+        let t = sum + y;
+        c = (t - sum) - y;
+        sum = t;
+    }
+
+    return sum;
+}
+
 /** Solve a linear system of equations given by a n&times;n matrix
  with a result vector n&times;1.
  https://martin-thoma.com/solving-linear-equations-with-gaussian-elimination/
@@ -302,57 +312,28 @@ function gauss(A) {
     return x;
 }
 
-function calculateSumOfNumbersInArray(array) {
-    let result = 0;
-
-    for (let i = 0; i < array.length; i++) {
-        result += array[i];
-    }
-
-    return result;
-}
-
-function calculateFirstRowLeastSquaresMethod(points) {
-    let row = [];
-
-    row.push(points.length);
-
-    let firstSum = calculateSumOfNumbersInArray(points.map(point => point['x']));
-    row.push(firstSum);
-
-    let secondSum = calculateSumOfNumbersInArray(points.map(point => point['y']));
-    secondSum = parseFloat(secondSum.toString());
-    row.push(secondSum);
-
-    return row;
-}
-
 function calculateRowLeastSquaresMethod(points, rowIndex, power) {
     let row = [];
 
     for (let k = 0; k <= power; k++) {
         let leftPartPoints = points.map(point => Math.pow(point['x'], rowIndex + k));
-        let leftPartSum = calculateSumOfNumbersInArray(leftPartPoints);
+        let leftPartSum = kahanSum(leftPartPoints);
         row.push(leftPartSum);
     }
 
     let rightPartPoints = points.map(point => Math.pow(point['x'], rowIndex) * point['y']);
-    let rightPartSum = calculateSumOfNumbersInArray(rightPartPoints);
+    let rightPartSum = kahanSum(rightPartPoints);
     row.push(rightPartSum);
 
     return row;
 }
 
-function approximateXWithLeastSquaresMethod(points, power, x, roundTo) {
+function approximateXWithLeastSquaresMethod(points, power, x) {
     console.log('Approximating with smallest squares method (only value)...');
 
-    if (!roundTo) {
-        roundTo = 3;
-    }
-
     if (power === 0) {
-        let result = calculateSumOfNumbersInArray(points.map(point => point['x']));
-        result = result * (1 / points.length);
+        let result = kahanSum(points.map(point => point['x']));
+        result /= points.length;
         return result;
     }
 
@@ -360,11 +341,11 @@ function approximateXWithLeastSquaresMethod(points, power, x, roundTo) {
     let row;
 
     for (let i = 0; i <= power; i++) {
-        row = calculateRowLeastSquaresMethod(points, i, power).map(number => roundNumberTo(number, roundTo));
+        row = calculateRowLeastSquaresMethod(points, i, power);
         matrix.push(row);
     }
 
-    let gaussResult = gauss(matrix).map(number => roundNumberTo(number, roundTo));
+    let gaussResult = gauss(matrix);
     let endResult = gaussResult[0];
 
     for (let i = 1; i < gaussResult.length; i++) {
@@ -373,3 +354,4 @@ function approximateXWithLeastSquaresMethod(points, power, x, roundTo) {
 
     return endResult;
 }
+
