@@ -198,7 +198,49 @@
             ], 3, 5.45);
             return result;
         },
-        '<h1></h1>',
+        '<h1>Метод на най-малките квадрати с алгебрични полиноми</h1>',
+        '<h2>Примери: </h2>'
+        function Страница_92_Пример_8() {
+            let points = [
+                {x: 0.51, y: 1.157},
+                {x: 1.02, y: 0.835},
+                {x: 1.53, y: 0.653},
+                {x: 2.04, y: 0.187},
+                {x: 2.55, y: 0.219},
+                {x: 3.06, y: 0.027},
+                {x: 3.57, y: 0.034},
+                {x: 4.08, y: -0.198},
+                {x: 4.59, y: -0.316}
+            ];
+            let x = 1;
+            let zeroPower = approximateXWithLeastSquaresMethod(points, 0, x);
+            let firstPower = approximateXWithLeastSquaresMethod(points, 1, x);
+            let secondPower = approximateXWithLeastSquaresMethod(points, 2, x);
+            let thirdPower = approximateXWithLeastSquaresMethod(points, 3, x);
+            let result = 'x = 1' +
+                '</br>' +
+                'Степен 0: ' + zeroPower +
+                'Степен 1: ' + firstPower +
+                'Степен 2: ' + secondPower +
+                'Степен 3: ' + thirdPower;
+            return result;
+        },
+        '<h2>Задачи: </h2>',
+        function Страница_100_Задача_1() {
+            let points = [
+                {x: -2, y: 1.8185},
+                {x: -1.5, y: 1.4962},
+                {x: -1, y: 0.8414},
+                {x: -0.5, y: 0.2397},
+                {x: 0, y: 0},
+                {x: 0.5, y: 0.2397},
+                {x: 1, y: 0.841},
+                {x: 1.5, y: 1.4962},
+                {x: 2, y: 1.818}
+            ];
+            let result = approximateXWithLeastSquaresMethod(points, 2, 1);
+            return 'При x = 1 резултата е: ' + result;
+        }
     ];
 
     //Долната част се използва за рендериране на задачите на страницата
